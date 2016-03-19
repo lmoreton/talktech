@@ -34,15 +34,19 @@ bot.on('message', function (msg) {
 
   var fromId = msg.from.id;
 
+  if (uploadingState == true) {
+  	bot.sendMessage(fromId, "Hey, I'm still working!");
+  	return;
+  }
+
   if (waitingForLogin == true) {
   	//Login requested.
   	if (login == "") {
   		var text = msg.text;
   		//bot.sendMessage(fromId, "Login: "+text);
   		login = text;
-  		bot.sendMessage(fromId, "Please type your YouTube password.");
   	}
-  	
+
   	else if (password == "") {
   		var text = msg.text;
   		//bot.sendMessage(fromId, "Login: "+text);
@@ -59,8 +63,9 @@ bot.on('message', function (msg) {
   
   if (video != null && uploadingState == false) {
   	sentVideo = video;
+  	sentVideoFromId = fromId;
   	bot.sendMessage(fromId, "Video recieved.");
-  	processVideo(msg);
+  	processVideo();
   }
   //var photo = 'cats.png';
   //bot.sendPhoto(chatId, photo, {caption: 'Lovely kittens'});
@@ -76,6 +81,8 @@ function processVideo() {
   		return;
   	}
 
-  	bot.sendMessage(fromId, "Processing...");
+  	uploadingState = true;
+
+  	bot.sendMessage(sentVideoFromId, "Processing...");
 
 }
