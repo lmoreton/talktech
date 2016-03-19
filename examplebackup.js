@@ -5,13 +5,15 @@ var token = '187634337:AAEoZr3M3m9AzgRYJoaxsTWVCuL_GHAYTu4';
 var bot = new TelegramBot(token, {polling: true});
 
 //Video uploading state
-var uploadingState = new Array();
-var waitingForLogin = new Array();
+var uploadingState = false;
+var waitingForLogin = false;
 
-var sentVideo = new Array();
+var sentVideo = null;
+var sentVideoFromId = null;
 
-var login = new Array();
-var password = new Array();
+
+var login = "";
+var password = "";
  
 // Matches /echo [whatever] 
 bot.onText(/\/echo (.+)/, function (msg, match) {
@@ -32,31 +34,26 @@ bot.on('message', function (msg) {
 
   var fromId = msg.from.id;
 
-  var stringedFromId = fromId.toString();
-
-  //bot.sendMessage(fromId, stringedFromId);
-
-  if (uploadingState[stringedFromId] == true) {
+  if (uploadingState == true) {
   	bot.sendMessage(fromId, "Hey, I'm still working!");
   	return;
   }
 
-  if (waitingForLogin[stringedFromId] == true) {
+  if (waitingForLogin == true) {
   	//Login requested.
-
-  	if (login[stringedFromId] == null) {
+  	if (login == "") {
   		var text = msg.text;
   		//bot.sendMessage(fromId, "Login: "+text);
-  		login[stringedFromId] = text;
+  		login = text;
   	}
 
-  	else if (password[stringedFromId] == null) {
+  	else if (password == "") {
   		var text = msg.text;
   		//bot.sendMessage(fromId, "Login: "+text);
-  		password[stringedFromId] = text;
+  		password = text;
   		bot.sendMessage(fromId, "Please type your YouTube password.");
-  		waitingForLogin[stringedFromId] = false;
-  		processVideo(msg);
+  		waitingForLogin = false;
+  		processVideo()
   	}
 
   	return;
@@ -64,31 +61,28 @@ bot.on('message', function (msg) {
 
   var video = msg.video;
   
-  if (video != null && uploadingState[stringedFromId] == null) {
-  	sentVideo[stringedFromId] = video;
+  if (video != null && uploadingState == false) {
+  	sentVideo = video;
+  	sentVideoFromId = fromId;
   	bot.sendMessage(fromId, "Video recieved.");
-  	processVideo(msg);
+  	processVideo();
   }
   //var photo = 'cats.png';
   //bot.sendPhoto(chatId, photo, {caption: 'Lovely kittens'});
 });
 
-function processVideo(msg) {
+function processVideo() {
 
-	var fromId = msg.from.id;
+  	//bot.sendMessage(fromId, "Processing...");
 
-	var stringedFromId = fromId.toString();
-
-  	//bot.sendMessage(fromId, "DEVProcessing...");
-
-  	if (login[stringedFromId] == null && password[stringedFromId] == null) {
-  		waitingForLogin[stringedFromId] = true;
-  		bot.sendMessage(fromId, "User not logged in. Please type your YouTube username.");
+  	if (login == "" && password == "") {
+  		waitingForLogin = true;
+  		bot.sendMessage(sentVideoFromId, "User not logged in. Please type your YouTube username.");
   		return;
   	}
 
-  	uploadingState[stringedFromId] = true;
+  	uploadingState = true;
 
-  	bot.sendMessage(fromId, "Processing...");
+  	bot.sendMessage(sentVideoFromId, "Processing...");
 
 }
