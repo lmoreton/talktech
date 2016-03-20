@@ -185,8 +185,6 @@ bot.on('message', function (msg) {
 
   var fromId = msg.from.id;
 
-  var stringedFromId = fromId.toString();
-
   //bot.sendMessage(fromId, stringedFromId);
 
   if (settingTag == true) {
@@ -243,6 +241,7 @@ bot.on('message', function (msg) {
   var video = msg.video;
   
   if (video != null && uploadingState[stringedFromId] == null) {
+  	var stringedFromId = fromId.toString();
   	sentVideo[stringedFromId] = video;
   	//bot.sendMessage(fromId, "Video recieved. Please wait!");
   	processVideo(msg);
